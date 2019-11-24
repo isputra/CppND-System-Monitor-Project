@@ -12,6 +12,11 @@ TEST(LinuxParserTest, Kernel)
     ASSERT_EQ(LinuxParser::Kernel(), "4.19.0-6-amd64");
 }
 
+TEST(LinuxParserTest, Pids)
+{
+    ASSERT_GT(LinuxParser::Pids().size(), 0);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
