@@ -90,10 +90,21 @@ float LinuxParser::MemoryUtilization() {
   // long nonCacheBufferMemory = totalMemoryUsed - (buffers + cachedMemory);
   // return (float)(nonCacheBufferMemory + buffers + cachedMemory)/(float)totalMemoryUsed;
   return (float) totalMemoryUsed / umap_meminfo["MemTotal"];
- }
+}
 
 // TODO: Read and return the system uptime
-long LinuxParser::UpTime() { return 0; }
+long LinuxParser::UpTime() {
+  string line;
+  long uptime_system;
+  long uptime_idle;
+  std::ifstream filestream(kProcDirectory + kUptimeFilename);
+  if (filestream.is_open()) {
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    linestream >> uptime_system >> uptime_idle;
+  }
+  return uptime_system;
+}
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() { return 0; }
@@ -144,7 +155,7 @@ int LinuxParser::RunningProcesses() {
   }
   return 0;
 
- }
+}
 
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function

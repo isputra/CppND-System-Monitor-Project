@@ -33,6 +33,12 @@ TEST(LinuxParserTest, RunningProcesses)
     ASSERT_GE(LinuxParser::RunningProcesses(), 0);
 }
 
+TEST(LinuxParserTest, UpTime)
+{
+    std::cout << LinuxParser::UpTime() << "\n";
+    ASSERT_GE(LinuxParser::UpTime(), 0);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
