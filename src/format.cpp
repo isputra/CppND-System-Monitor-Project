@@ -16,5 +16,5 @@ string Format::ElapsedTime(long seconds) {
     s = (seconds % 3600) % 60;
     return (h < 10 ? "0" + to_string(h) : to_string(h))
     + ":" + (m < 10 ? "0" + to_string(m) : to_string(m))
-    + ":" + to_string(s);
+    + ":" + (s < 10 ? "0" + to_string(s) : to_string(s));
 }
