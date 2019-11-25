@@ -23,6 +23,11 @@ TEST(LinuxParserTest, MemoryUtilization)
     ASSERT_GT(LinuxParser::MemoryUtilization(), 0);
 }
 
+TEST(LinuxParserTest, TotalProcesses)
+{
+    ASSERT_GT(LinuxParser::TotalProcesses(), 0);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);

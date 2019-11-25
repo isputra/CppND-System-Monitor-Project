@@ -72,7 +72,7 @@ vector<int> LinuxParser::Pids() {
 float LinuxParser::MemoryUtilization() { 
   string line;
   string key;
-  string value;
+  long value;
   std::ifstream filestream(kProcDirectory + kMeminfoFilename);
   std::unordered_map<string, long> umap_meminfo;
   if (filestream.is_open()) {
@@ -80,7 +80,7 @@ float LinuxParser::MemoryUtilization() {
       std::replace(line.begin(), line.end(), ':', ' ');
       std::istringstream linestream(line);
       linestream >> key >> value;
-      umap_meminfo[key] = std::stol(value);
+      umap_meminfo[key] = value;
     }
   }
 
@@ -112,7 +112,21 @@ long LinuxParser::IdleJiffies() { return 0; }
 vector<string> LinuxParser::CpuUtilization() { return {}; }
 
 // TODO: Read and return the total number of processes
-int LinuxParser::TotalProcesses() { return 0; }
+int LinuxParser::TotalProcesses() { 
+  string line;
+  string key;
+  int value;
+  std::ifstream filestream(kProcDirectory + kStatFilename);
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::istringstream linestream(line);
+      linestream >> key >> value;
+      if(key == "processes")
+        return value;
+    }
+  }
+  return 0;
+}
 
 // TODO: Read and return the number of running processes
 int LinuxParser::RunningProcesses() { return 0; }
