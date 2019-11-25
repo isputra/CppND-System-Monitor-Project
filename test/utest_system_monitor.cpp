@@ -4,12 +4,12 @@
 
 TEST(LinuxParserTest, OperatingSystem)
 {
-    ASSERT_EQ(LinuxParser::OperatingSystem(), "Debian GNU/Linux 10 (buster)");
+    ASSERT_EQ(LinuxParser::OperatingSystem(), "Ubuntu 19.04");
 }
 
 TEST(LinuxParserTest, Kernel)
 {
-    ASSERT_EQ(LinuxParser::Kernel(), "4.19.0-6-amd64");
+    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-13-generic");
 }
 
 TEST(LinuxParserTest, Pids)
