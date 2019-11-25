@@ -28,6 +28,11 @@ TEST(LinuxParserTest, TotalProcesses)
     ASSERT_GT(LinuxParser::TotalProcesses(), 0);
 }
 
+TEST(LinuxParserTest, RunningProcesses)
+{
+    ASSERT_GE(LinuxParser::RunningProcesses(), 0);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
