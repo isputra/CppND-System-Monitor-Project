@@ -2,6 +2,7 @@
 #include <iostream>
 
 #include "linux_parser.h"
+#include "format.h"
 
 TEST(LinuxParserTest, OperatingSystem)
 {
@@ -35,8 +36,14 @@ TEST(LinuxParserTest, RunningProcesses)
 
 TEST(LinuxParserTest, UpTime)
 {
-    std::cout << LinuxParser::UpTime() << "\n";
     ASSERT_GE(LinuxParser::UpTime(), 0);
+}
+
+TEST(Format, ElapsedTime)
+{
+    EXPECT_EQ(Format::ElapsedTime(3661), "01:01:01");
+    EXPECT_EQ(Format::ElapsedTime(32949), "09:09:09");
+    EXPECT_EQ(Format::ElapsedTime(36610), "10:10:10");
 }
 
 int main(int argc, char* argv[])
