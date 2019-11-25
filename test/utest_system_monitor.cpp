@@ -1,8 +1,11 @@
 #include <gtest/gtest.h>
 #include <iostream>
+#include <vector>
 
 #include "linux_parser.h"
 #include "format.h"
+#include "processor.h"
+#include "system.h"
 
 TEST(LinuxParserTest, OperatingSystem)
 {
@@ -49,6 +52,13 @@ TEST(Format, ElapsedTime)
 TEST(LinuxParserTest, CpuUtilization)
 {
     ASSERT_EQ(LinuxParser::CpuUtilization().size(), 10);
+}
+
+TEST(Processor, Utilization)
+{
+    Processor procesor;
+    ASSERT_GT(procesor.Utilization(), 0);
+
 }
 
 int main(int argc, char* argv[])
