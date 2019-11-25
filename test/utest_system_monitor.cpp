@@ -10,12 +10,17 @@ TEST(LinuxParserTest, OperatingSystem)
 
 TEST(LinuxParserTest, Kernel)
 {
-    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-13-generic");
+    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-36-generic");
 }
 
 TEST(LinuxParserTest, Pids)
 {
     ASSERT_GT(LinuxParser::Pids().size(), 0);
+}
+
+TEST(LinuxParserTest, MemoryUtilization)
+{
+    ASSERT_GT(LinuxParser::MemoryUtilization(), 0);
 }
 
 int main(int argc, char* argv[])

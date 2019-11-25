@@ -2,6 +2,8 @@
 #include <unistd.h>
 #include <string>
 #include <vector>
+#include <unordered_map>
+#include <iostream>
 
 #include "linux_parser.h"
 
@@ -67,7 +69,28 @@ vector<int> LinuxParser::Pids() {
 }
 
 // TODO: Read and return the system memory utilization
-float LinuxParser::MemoryUtilization() { return 0.0; }
+float LinuxParser::MemoryUtilization() { 
+  string line;
+  string key;
+  string value;
+  std::ifstream filestream(kProcDirectory + kMeminfoFilename);
+  std::unordered_map<string, long> umap_meminfo;
+  if (filestream.is_open()) {
+    while (std::getline(filestream, line)) {
+      std::replace(line.begin(), line.end(), ':', ' ');
+      std::istringstream linestream(line);
+      linestream >> key >> value;
+      umap_meminfo[key] = std::stol(value);
+    }
+  }
+
+  long totalMemoryUsed = umap_meminfo["MemTotal"] - umap_meminfo["MemFree"];
+  // long buffers = umap_meminfo["Buffers"];
+  // long cachedMemory = umap_meminfo["Cached"] + umap_meminfo["SReclaimable"] - umap_meminfo["Shmem"];
+  // long nonCacheBufferMemory = totalMemoryUsed - (buffers + cachedMemory);
+  // return (float)(nonCacheBufferMemory + buffers + cachedMemory)/(float)totalMemoryUsed;
+  return (float) totalMemoryUsed / umap_meminfo["MemTotal"];
+ }
 
 // TODO: Read and return the system uptime
 long LinuxParser::UpTime() { return 0; }
