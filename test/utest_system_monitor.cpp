@@ -1,6 +1,7 @@
 #include <gtest/gtest.h>
-#include "../include/linux_parser.h"
 #include <iostream>
+
+#include "linux_parser.h"
 
 TEST(LinuxParserTest, OperatingSystem)
 {
