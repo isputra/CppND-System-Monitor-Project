@@ -46,6 +46,11 @@ TEST(Format, ElapsedTime)
     EXPECT_EQ(Format::ElapsedTime(36610), "10:10:10");
 }
 
+TEST(LinuxParserTest, CpuUtilization)
+{
+    ASSERT_EQ(LinuxParser::CpuUtilization().size(), 10);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
