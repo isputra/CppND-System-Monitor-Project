@@ -70,6 +70,17 @@ TEST(LinuxParserTest, User)
 {
     ASSERT_EQ(LinuxParser::User(3746), "ikhsan");
 }
+
+TEST(LinuxParserTest, Command)
+{
+    ASSERT_GT(LinuxParser::Command(3746).size(), 0);
+}
+
+TEST(LinuxParserTest, Ram)
+{
+    ASSERT_GT(std::stoi(LinuxParser::Ram(3746)), 0);
+}
+
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
