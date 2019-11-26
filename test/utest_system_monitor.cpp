@@ -42,7 +42,7 @@ TEST(LinuxParserTest, UpTime)
     ASSERT_GE(LinuxParser::UpTime(), 0);
 }
 
-TEST(Format, ElapsedTime)
+TEST(FormatTest, ElapsedTime)
 {
     EXPECT_EQ(Format::ElapsedTime(3661), "01:01:01");
     EXPECT_EQ(Format::ElapsedTime(32949), "09:09:09");
@@ -54,13 +54,22 @@ TEST(LinuxParserTest, CpuUtilization)
     ASSERT_EQ(LinuxParser::CpuUtilization().size(), 10);
 }
 
-TEST(Processor, Utilization)
+TEST(ProcessorTest, Utilization)
 {
     Processor procesor;
     ASSERT_GT(procesor.Utilization(), 0);
 
 }
 
+TEST(LinuxParserTest, Uid)
+{
+    ASSERT_EQ(LinuxParser::Uid(3746), "1000");
+}
+
+TEST(LinuxParserTest, User)
+{
+    ASSERT_EQ(LinuxParser::User(3746), "ikhsan");
+}
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);
