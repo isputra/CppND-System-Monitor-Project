@@ -14,7 +14,7 @@ TEST(LinuxParserTest, OperatingSystem)
 
 TEST(LinuxParserTest, Kernel)
 {
-    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-36-generic");
+    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-13-generic");
 }
 
 TEST(LinuxParserTest, Pids)
