@@ -114,10 +114,22 @@ long LinuxParser::Jiffies() { return 0; }
 long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
 
 // TODO: Read and return the number of active jiffies for the system
-long LinuxParser::ActiveJiffies() { return 0; }
+long LinuxParser::ActiveJiffies() {
+  return stol(CpuUtilization()[kUser_])
+        + stol(CpuUtilization()[kNice_])
+        + stol(CpuUtilization()[kSystem_])
+        + stol(CpuUtilization()[kIRQ_])
+        + stol(CpuUtilization()[kSoftIRQ_])
+        + stol(CpuUtilization()[kSteal_])
+        + stol(CpuUtilization()[kGuest_])
+        + stol(CpuUtilization()[kGuestNice_]);
+}
 
 // TODO: Read and return the number of idle jiffies for the system
-long LinuxParser::IdleJiffies() { return 0; }
+long LinuxParser::IdleJiffies() {
+  return stol(CpuUtilization()[kIdle_])
+        + stol(CpuUtilization()[kIOwait_]);
+}
 
 // TODO: Read and return CPU utilization
 vector<string> LinuxParser::CpuUtilization() {
@@ -259,6 +271,11 @@ long LinuxParser::UpTime(int pid) {
     }
   }
   long uptime = LinuxParser::UpTime();
+  //std::cout << "Uptime: " << uptime << '\n';
+  //std::cout << "starttime: " << starttime << '\n';
+  //std::cout << "sysconf(_SC_CLK_TCK): " << sysconf(_SC_CLK_TCK) << '\n';
+  //std::cout << "starttime / sysconf(_SC_CLK_TCK): " << (starttime / sysconf(_SC_CLK_TCK)) << '\n';
+  //return (starttime / sysconf(_SC_CLK_TCK));
   return uptime - (starttime / sysconf(_SC_CLK_TCK));
 }
 

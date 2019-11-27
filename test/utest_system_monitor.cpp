@@ -14,7 +14,7 @@ TEST(LinuxParserTest, OperatingSystem)
 
 TEST(LinuxParserTest, Kernel)
 {
-    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-13-generic");
+    ASSERT_EQ(LinuxParser::Kernel(), "5.0.0-36-generic");
 }
 
 TEST(LinuxParserTest, Pids)
@@ -63,22 +63,28 @@ TEST(ProcessorTest, Utilization)
 
 TEST(LinuxParserTest, Uid)
 {
-    ASSERT_EQ(LinuxParser::Uid(3746), "1000");
+    ASSERT_EQ(LinuxParser::Uid(1956), "1000");
 }
 
 TEST(LinuxParserTest, User)
 {
-    ASSERT_EQ(LinuxParser::User(3746), "ikhsan");
+    ASSERT_EQ(LinuxParser::User(1956), "ikhsan");
 }
 
 TEST(LinuxParserTest, Command)
 {
-    ASSERT_GT(LinuxParser::Command(3746).size(), 0);
+    ASSERT_GT(LinuxParser::Command(1956).size(), 0);
 }
 
 TEST(LinuxParserTest, Ram)
 {
-    ASSERT_GT(std::stoi(LinuxParser::Ram(3746)), 0);
+    ASSERT_GT(std::stoi(LinuxParser::Ram(1956)), 0);
+}
+
+TEST(LinuxParserTest, UptimePid)
+{
+//    std::cout << LinuxParser::UpTime(1956) << '\n';
+    ASSERT_GT(LinuxParser::UpTime(1956), 0);
 }
 
 int main(int argc, char* argv[])
