@@ -205,7 +205,7 @@ string LinuxParser::Ram(int pid) {
       std::istringstream stringstream(line);
       stringstream >> key >> value;
       if (key == "VmSize:") {
-        return value;
+        return to_string(stof(value) / 1024);
       }
     }
   }
@@ -256,32 +256,22 @@ string LinuxParser::User(int pid) {
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::UpTime(int pid) {
   string line, value;
-  long starttime;
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
   if (filestream.is_open()) {
     getline(filestream, line);
     std::istringstream linestream(line);
     int i = 0;
     while (linestream >> value) {
-      if (i == 22) {
-        starttime = stol(value);
-        break;
-      }
+      if (i == 14) return stol(value) / sysconf(_SC_CLK_TCK);
       i++;
     }
   }
-  long uptime = LinuxParser::UpTime();
-  //std::cout << "Uptime: " << uptime << '\n';
-  //std::cout << "starttime: " << starttime << '\n';
-  //std::cout << "sysconf(_SC_CLK_TCK): " << sysconf(_SC_CLK_TCK) << '\n';
-  //std::cout << "starttime / sysconf(_SC_CLK_TCK): " << (starttime / sysconf(_SC_CLK_TCK)) << '\n';
-  //return (starttime / sysconf(_SC_CLK_TCK));
-  return uptime - (starttime / sysconf(_SC_CLK_TCK));
+  return 0;
 }
 
 long LinuxParser::Cpu(int pid) {
   string line, value;
-  long total_time = 0;
+  long total_time = 0, starttime;
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
   if (filestream.is_open()) {
     getline(filestream, line);
@@ -291,10 +281,13 @@ long LinuxParser::Cpu(int pid) {
       if (i == 14 || i == 15 || i == 16 || i == 17) {
         total_time += stol(value);
       }
-      if (i > 17) break;
+      if (i == 22) {
+        starttime = stol(value);
+        break;
+      }
       i++;
     }
   }
-  long seconds = LinuxParser::UpTime(pid);
+  long seconds = LinuxParser::UpTime() - (starttime / sysconf(_SC_CLK_TCK));
   return 100 * ( (total_time / sysconf(_SC_CLK_TCK)) / seconds );
 }
