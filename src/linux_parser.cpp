@@ -262,7 +262,7 @@ long LinuxParser::UpTime(int pid) {
   return uptime - (starttime / sysconf(_SC_CLK_TCK));
 }
 
-long LinuxParser::CpuUtilization(int pid) {
+long LinuxParser::Cpu(int pid) {
   string line, value;
   long total_time = 0;
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
