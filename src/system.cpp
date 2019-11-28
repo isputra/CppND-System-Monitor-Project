@@ -25,7 +25,9 @@ vector<Process>& System::Processes() {
         Process p(*iter_pids);
         processes_.push_back(p);
     }
-    // sort processess before returning them
+    sort(processes_.begin(), processes_.end(), [](Process const &a, Process const &b) {
+        return a < b;
+    });
     return processes_;
 }
 
