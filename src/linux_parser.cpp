@@ -107,28 +107,55 @@ long LinuxParser::UpTime() {
 }
 
 // TODO: Read and return the number of jiffies for the system
-long LinuxParser::Jiffies() { return 0; }
+long LinuxParser::Jiffies() {
+  const long nonidle = ActiveJiffies();
+  const long idle = IdleJiffies();
+  return nonidle / (nonidle + idle);
+}
 
 // TODO: Read and return the number of active jiffies for a PID
 // REMOVE: [[maybe_unused]] once you define the function
-long LinuxParser::ActiveJiffies(int pid[[maybe_unused]]) { return 0; }
+long LinuxParser::ActiveJiffies(int pid) {
+  string line, value;
+  long total_time = 0, starttime;
+  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
+  if (filestream.is_open()) {
+    getline(filestream, line);
+    std::istringstream linestream(line);
+    int i = 0;
+    while (linestream >> value) {
+      if (i == 14 || i == 15 || i == 16 || i == 17) {
+        total_time += stol(value);
+      }
+      if (i == 22) {
+        starttime = stol(value);
+        break;
+      }
+      i++;
+    }
+  }
+  long seconds = LinuxParser::UpTime() - (starttime / sysconf(_SC_CLK_TCK));
+  return 100 * ( (total_time / sysconf(_SC_CLK_TCK)) / seconds );
+}
 
 // TODO: Read and return the number of active jiffies for the system
 long LinuxParser::ActiveJiffies() {
-  return stol(CpuUtilization()[kUser_])
-        + stol(CpuUtilization()[kNice_])
-        + stol(CpuUtilization()[kSystem_])
-        + stol(CpuUtilization()[kIRQ_])
-        + stol(CpuUtilization()[kSoftIRQ_])
-        + stol(CpuUtilization()[kSteal_])
-        + stol(CpuUtilization()[kGuest_])
-        + stol(CpuUtilization()[kGuestNice_]);
+  vector<string> cpus = CpuUtilization();
+  return stol(cpus[kUser_])
+        + stol(cpus[kNice_])
+        + stol(cpus[kSystem_])
+        + stol(cpus[kIRQ_])
+        + stol(cpus[kSoftIRQ_])
+        + stol(cpus[kSteal_])
+        + stol(cpus[kGuest_])
+        + stol(cpus[kGuestNice_]);
 }
 
 // TODO: Read and return the number of idle jiffies for the system
 long LinuxParser::IdleJiffies() {
-  return stol(CpuUtilization()[kIdle_])
-        + stol(CpuUtilization()[kIOwait_]);
+  vector<string> cpus = CpuUtilization();
+  return stol(cpus[kIdle_])
+        + stol(cpus[kIOwait_]);
 }
 
 // TODO: Read and return CPU utilization

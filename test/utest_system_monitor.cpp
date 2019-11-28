@@ -63,30 +63,45 @@ TEST(ProcessorTest, Utilization)
 
 TEST(LinuxParserTest, Uid)
 {
-    ASSERT_EQ(LinuxParser::Uid(1956), "1000");
+    ASSERT_EQ(LinuxParser::Uid(1842), "1000");
 }
 
 TEST(LinuxParserTest, User)
 {
-    ASSERT_EQ(LinuxParser::User(1956), "ikhsan");
+    ASSERT_EQ(LinuxParser::User(1842), "ikhsan");
 }
 
 TEST(LinuxParserTest, Command)
 {
-    ASSERT_GT(LinuxParser::Command(1956).size(), 0);
+    ASSERT_GT(LinuxParser::Command(1842).size(), 0);
 }
 
 TEST(LinuxParserTest, Ram)
 {
-    ASSERT_GT(std::stoi(LinuxParser::Ram(1956)), 0);
+    ASSERT_GT(std::stoi(LinuxParser::Ram(1842)), 0);
 }
 
 TEST(LinuxParserTest, UptimePid)
 {
-//    std::cout << LinuxParser::UpTime(1956) << '\n';
-    ASSERT_GT(LinuxParser::UpTime(1956), 0);
+    ASSERT_GT(LinuxParser::UpTime(1842), 0);
 }
 
+/*TEST(LinuxParserTest, Jiffies)
+{
+    ASSERT_GT(LinuxParser::Jiffies(), 0);
+}*/
+
+TEST(LinuxParserTest, ActiveJiffies)
+{
+    //std::cout << "Active Jiffes: " << LinuxParser::ActiveJiffies() << '\n';
+    ASSERT_GT(LinuxParser::ActiveJiffies(), 0);
+}
+
+TEST(LinuxParserTest, IdleJiffies)
+{
+    //std::cout << "Idle Jiffes: " << LinuxParser::IdleJiffies() << '\n';
+    ASSERT_GT(LinuxParser::IdleJiffies(), 0);
+}
 int main(int argc, char* argv[])
 {
     testing::InitGoogleTest(&argc, argv);

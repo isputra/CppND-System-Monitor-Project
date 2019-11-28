@@ -5,7 +5,7 @@
 using namespace LinuxParser;
 
 // TODO: Return the aggregate CPU utilization
-float Processor::Utilization() {
+/*float Processor::Utilization() {
     int idle=0, nonidle=0, i=0;
     int prev_idle=0, prev_nonidle=0;
     prev_cpus = CpuUtilization();
@@ -21,6 +21,17 @@ float Processor::Utilization() {
             nonidle += std::stoi(*iter_cpu);
         }
     }
+    idle = idle - prev_idle;
+    nonidle = nonidle - prev_nonidle;
+    return (float) nonidle / (nonidle + idle);
+}*/
+
+float Processor::Utilization() {
+    long const prev_idle = LinuxParser::IdleJiffies();
+    long const prev_nonidle = LinuxParser::ActiveJiffies();
+    std::this_thread::sleep_for(std::chrono::seconds(2));
+    long idle = LinuxParser::IdleJiffies();
+    long nonidle = LinuxParser::ActiveJiffies();
     idle = idle - prev_idle;
     nonidle = nonidle - prev_nonidle;
     return (float) nonidle / (nonidle + idle);
