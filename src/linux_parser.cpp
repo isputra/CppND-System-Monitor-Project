@@ -108,9 +108,17 @@ long LinuxParser::UpTime() {
 
 // TODO: Read and return the number of jiffies for the system
 long LinuxParser::Jiffies() {
-  const long nonidle = ActiveJiffies();
-  const long idle = IdleJiffies();
-  return nonidle / (nonidle + idle);
+  vector<string> cpus = CpuUtilization();
+  return stol(cpus[kUser_])
+        + stol(cpus[kNice_])
+        + stol(cpus[kSystem_])
+        + stol(cpus[kIdle_])
+        + stol(cpus[kIOwait_])
+        + stol(cpus[kIRQ_])
+        + stol(cpus[kSoftIRQ_])
+        + stol(cpus[kSteal_])
+        + stol(cpus[kGuest_])
+        + stol(cpus[kGuestNice_]);
 }
 
 // TODO: Read and return the number of active jiffies for a PID
