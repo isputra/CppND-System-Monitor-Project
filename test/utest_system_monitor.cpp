@@ -63,27 +63,27 @@ TEST(ProcessorTest, Utilization)
 
 TEST(LinuxParserTest, Uid)
 {
-    ASSERT_EQ(LinuxParser::Uid(1842), "1000");
+    ASSERT_EQ(LinuxParser::Uid(1362), "1000");
 }
 
 TEST(LinuxParserTest, User)
 {
-    ASSERT_EQ(LinuxParser::User(1842), "ikhsan");
+    ASSERT_EQ(LinuxParser::User(1362), "ikhsan");
 }
 
 TEST(LinuxParserTest, Command)
 {
-    ASSERT_GT(LinuxParser::Command(1842).size(), 0);
+    ASSERT_GT(LinuxParser::Command(1362).size(), 0);
 }
 
 TEST(LinuxParserTest, Ram)
 {
-    ASSERT_GT(std::stoi(LinuxParser::Ram(1842)), 0);
+    ASSERT_GT(std::stoi(LinuxParser::Ram(1362)), 0);
 }
 
 TEST(LinuxParserTest, UptimePid)
 {
-    ASSERT_GT(LinuxParser::UpTime(1842), 0);
+    ASSERT_GT(LinuxParser::UpTime(1362), 0);
 }
 
 /*TEST(LinuxParserTest, Jiffies)
