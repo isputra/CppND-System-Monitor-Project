@@ -2,6 +2,7 @@
 #define PROCESS_H
 
 #include <string>
+#include <unistd.h>
 #include "linux_parser.h"
 
 /*
@@ -11,8 +12,17 @@ It contains relevant attributes as shown below
 class Process {
  public:
   Process(int pid) : pid_(pid) {
-      cpu_ = LinuxParser::Cpu(pid_);
+      int const freq = sysconf(_SC_CLK_TCK);
+
+      user_ = LinuxParser::User(pid_);
+      command_= LinuxParser::Command(pid_);
+
+      ram_ = LinuxParser::Ram(pid_);
+      upTime_ = LinuxParser::UpTime(pid_);
+      cpu_ = 100 * ( (float)(LinuxParser::ActiveJiffies(pid_) / freq) / upTime_ );
   };
+  std::string ram_;
+ float cpu_;
   int Pid();                               // TODO: See src/process.cpp
   std::string User();                      // TODO: See src/process.cpp
   std::string Command();                   // TODO: See src/process.cpp
@@ -24,7 +34,10 @@ class Process {
   // TODO: Declare any necessary private members
  private:
  int pid_;
- float cpu_;
+ std::string user_;
+ std::string command_;
+ long int upTime_;
+
 };
 
 #endif

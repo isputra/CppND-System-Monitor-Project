@@ -115,25 +115,30 @@ long LinuxParser::Jiffies() {
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid) {
   string line, value;
-  long total_time = 0, starttime;
+  long totalTime, utime, stime, cutime, cstime, cpuUsage;
+  long upTimeProcess = UpTime(pid);
+  int const offset = 1;
+  int const freq = sysconf(_SC_CLK_TCK);
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
   if (filestream.is_open()) {
     getline(filestream, line);
     std::istringstream linestream(line);
-    int i = 0;
-    while (linestream >> value) {
-      if (i == 14 || i == 15 || i == 16 || i == 17) {
-        total_time += stol(value);
-      }
-      if (i == 22) {
-        starttime = stol(value);
-        break;
-      }
-      i++;
-    }
+    std::istream_iterator<string> begin(linestream), end;
+    vector<string> linecontent(begin, end);
+    utime = stol(linecontent[14 - offset]);
+    stime = stol(linecontent[15 - offset]);
+    cutime = stol(linecontent[16 - offset]);
+    cstime = stol(linecontent[17 - offset]);
+    totalTime = utime + stime + cutime + cstime;
+    cpuUsage = 100 * (float)( (totalTime / freq) / upTimeProcess );
+    //std::cout << "utime: " << utime << '\n';
+    //std::cout << "stime: " << stime << '\n';
+    //std::cout << "cutime: " << cutime << '\n';
+    //std::cout << "cstime: " << cstime << '\n';
+    //std::cout << "totalTime: " << totalTime << '\n';
+    //std::cout << "cpuUsage: " << cpuUsage << '\n';
   }
-  long seconds = LinuxParser::UpTime() - (starttime / sysconf(_SC_CLK_TCK));
-  return 100 * ( (total_time / sysconf(_SC_CLK_TCK)) / seconds );
+  return totalTime;
 }
 
 // TODO: Read and return the number of active jiffies for the system
@@ -212,10 +217,12 @@ int LinuxParser::RunningProcesses() {
 // TODO: Read and return the command associated with a process
 // REMOVE: [[maybe_unused]] once you define the function
 string LinuxParser::Command(int pid) {
-  string cmdline;
+  string line, cmdline;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) + kCmdlineFilename);
   if (filestream.is_open()) {
-    std::getline(filestream, cmdline);
+    std::getline(filestream, line);
+    std::istringstream linestream(line);
+    linestream >> cmdline;
   }
   return cmdline;
 }
@@ -294,28 +301,10 @@ long LinuxParser::UpTime(int pid) {
     startTimeInClocks = stol(linecontent[22 - offset]);
     startTimeInSeconds =  startTimeInClocks / freq;
     upTimeProcess = upTimeSystem - startTimeInSeconds;
+    //std::cout << "startTimeInClocks: " << startTimeInClocks << '\n';
+    //std::cout << "freq: " << freq << '\n';
+    //std::cout << "startTimeInSeconds: " << startTimeInSeconds << '\n';
+    //std::cout << "upTimeProcess: " << upTimeProcess << '\n';
   }
   return upTimeProcess;
-}
-
-long LinuxParser::Cpu(int pid) {
-  string line, value;
-  long totalTime, utime, stime, cutime, cstime, cpuUsage;
-  long upTimeProcess = UpTime(pid);
-  int const offset = 1;
-  int const freq = sysconf(_SC_CLK_TCK);
-  std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
-  if (filestream.is_open()) {
-    getline(filestream, line);
-    std::istringstream linestream(line);
-    std::istream_iterator<string> begin(linestream), end;
-    vector<string> linecontent(begin, end);
-    utime = stol(linecontent[14 - offset]);
-    stime = stol(linecontent[15 - offset]);
-    cutime = stol(linecontent[16 - offset]);
-    cstime = stol(linecontent[17 - offset]);
-    totalTime = utime + stime + cutime + cstime;
-    cpuUsage = 100 * ( (totalTime / freq) / upTimeProcess );
-  }
-  return cpuUsage;
 }

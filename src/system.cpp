@@ -26,7 +26,8 @@ vector<Process>& System::Processes() {
         processes_.push_back(p);
     }
     sort(processes_.begin(), processes_.end(), [](Process const &a, Process const &b) {
-        return a < b;
+        return a.cpu_ > b.cpu_;
+        //return stof(a.ram_) > stof(b.ram_);
     });
     return processes_;
 }
