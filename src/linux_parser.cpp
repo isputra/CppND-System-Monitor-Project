@@ -85,10 +85,6 @@ float LinuxParser::MemoryUtilization() {
   }
 
   long totalMemoryUsed = umap_meminfo["MemTotal"] - umap_meminfo["MemFree"];
-  // long buffers = umap_meminfo["Buffers"];
-  // long cachedMemory = umap_meminfo["Cached"] + umap_meminfo["SReclaimable"] - umap_meminfo["Shmem"];
-  // long nonCacheBufferMemory = totalMemoryUsed - (buffers + cachedMemory);
-  // return (float)(nonCacheBufferMemory + buffers + cachedMemory)/(float)totalMemoryUsed;
   return (float) totalMemoryUsed / umap_meminfo["MemTotal"];
 }
 
@@ -220,9 +216,7 @@ string LinuxParser::Command(int pid) {
   string line, cmdline;
   std::ifstream filestream(kProcDirectory + std::to_string(pid) + kCmdlineFilename);
   if (filestream.is_open()) {
-    std::getline(filestream, line);
-    std::istringstream linestream(line);
-    linestream >> cmdline;
+    std::getline(filestream, cmdline);
   }
   return cmdline;
 }
