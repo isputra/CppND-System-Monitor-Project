@@ -28,6 +28,7 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
+// Show bars based on its group
 std::string NCursesDisplay::ShowBars(float percent) {
     std::string result{};
     int size{50};
@@ -40,6 +41,7 @@ std::string NCursesDisplay::ShowBars(float percent) {
     return result;
 }
 
+// Display Progress bar as groups
 void NCursesDisplay::GroupProgressBar(WINDOW* system_window, int row, std::vector<float> percentages) {
     int idx_color_pair = 2; // color pair that'll be assigned to each group of bar
     int start_column = 12; // 10 + length of string(0%)
@@ -76,10 +78,6 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   wprintw(window, ProgressBar(system.Cpu().Utilization()).c_str());
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2, "Memory: ");
-  /* wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.MemoryUtilization()).c_str());
-  wattroff(window, COLOR_PAIR(1)); */
   GroupProgressBar(window, row, system.VectorMemoryUtilization());
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
