@@ -12,17 +12,14 @@ It contains relevant attributes as shown below
 class Process {
  public:
   Process(int pid) : pid_(pid) {
-      int const freq = sysconf(_SC_CLK_TCK);
-
       user_ = LinuxParser::User(pid_);
       command_= LinuxParser::Command(pid_);
-
       ram_ = LinuxParser::Ram(pid_);
       upTime_ = LinuxParser::UpTime(pid_);
-      cpu_ = 100 * ( (float)(LinuxParser::ActiveJiffies(pid_) / freq) / upTime_ );
+      cpu_ = LinuxParser::Cpu(pid_);
   };
   std::string ram_;
- float cpu_;
+  float cpu_;
   int Pid();                               // TODO: See src/process.cpp
   std::string User();                      // TODO: See src/process.cpp
   std::string Command();                   // TODO: See src/process.cpp

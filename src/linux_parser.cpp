@@ -115,10 +115,8 @@ long LinuxParser::Jiffies() {
 // REMOVE: [[maybe_unused]] once you define the function
 long LinuxParser::ActiveJiffies(int pid) {
   string line, value;
-  long totalTime, utime, stime, cutime, cstime, cpuUsage;
-  long upTimeProcess = UpTime(pid);
+  long totalTime, utime, stime, cutime, cstime;
   int const offset = 1;
-  int const freq = sysconf(_SC_CLK_TCK);
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
   if (filestream.is_open()) {
     getline(filestream, line);
@@ -130,15 +128,17 @@ long LinuxParser::ActiveJiffies(int pid) {
     cutime = stol(linecontent[16 - offset]);
     cstime = stol(linecontent[17 - offset]);
     totalTime = utime + stime + cutime + cstime;
-    cpuUsage = 100 * (float)( (totalTime / freq) / upTimeProcess );
-    //std::cout << "utime: " << utime << '\n';
-    //std::cout << "stime: " << stime << '\n';
-    //std::cout << "cutime: " << cutime << '\n';
-    //std::cout << "cstime: " << cstime << '\n';
-    //std::cout << "totalTime: " << totalTime << '\n';
-    //std::cout << "cpuUsage: " << cpuUsage << '\n';
   }
   return totalTime;
+}
+
+float LinuxParser::Cpu(int pid) {
+  float cpuUsage;
+  long totalTime = ActiveJiffies(pid);
+  long upTimeProcess = UpTime(pid);
+  int const freq = sysconf(_SC_CLK_TCK);
+  cpuUsage = 100 * (float)( (totalTime / freq) / upTimeProcess );
+  return cpuUsage;
 }
 
 // TODO: Read and return the number of active jiffies for the system
@@ -301,10 +301,6 @@ long LinuxParser::UpTime(int pid) {
     startTimeInClocks = stol(linecontent[22 - offset]);
     startTimeInSeconds =  startTimeInClocks / freq;
     upTimeProcess = upTimeSystem - startTimeInSeconds;
-    //std::cout << "startTimeInClocks: " << startTimeInClocks << '\n';
-    //std::cout << "freq: " << freq << '\n';
-    //std::cout << "startTimeInSeconds: " << startTimeInSeconds << '\n';
-    //std::cout << "upTimeProcess: " << upTimeProcess << '\n';
   }
   return upTimeProcess;
 }
