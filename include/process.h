@@ -18,8 +18,6 @@ class Process {
       upTime_ = LinuxParser::UpTime(pid_);
       cpu_ = LinuxParser::Cpu(pid_);
   };
-  std::string ram_;
-  float cpu_;
   int Pid();                               // TODO: See src/process.cpp
   std::string User();                      // TODO: See src/process.cpp
   std::string Command();                   // TODO: See src/process.cpp
@@ -30,10 +28,12 @@ class Process {
 
   // TODO: Declare any necessary private members
  private:
- int pid_;
- std::string user_;
- std::string command_;
- long int upTime_;
+  int pid_;
+  float cpu_;
+  std::string ram_;
+  std::string user_;
+  std::string command_;
+  long int upTime_;
 
 };
 
