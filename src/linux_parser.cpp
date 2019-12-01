@@ -6,6 +6,7 @@
 #include <iostream>
 
 #include "linux_parser.h"
+#define FREQ sysconf(_SC_CLK_TCK)
 
 using std::stof;
 using std::string;
@@ -132,8 +133,7 @@ float LinuxParser::Cpu(int pid) {
   float cpuUsage;
   long totalTime = ActiveJiffies(pid);
   long upTimeProcess = UpTime(pid);
-  int const freq = sysconf(_SC_CLK_TCK);
-  cpuUsage = ((float)totalTime / freq) / upTimeProcess;
+  cpuUsage = ((float)totalTime / FREQ) / upTimeProcess;
   return cpuUsage;
 }
 
@@ -285,7 +285,6 @@ long LinuxParser::UpTime(int pid) {
   long startTimeInSeconds, startTimeInClocks, upTimeProcess;
   long upTimeSystem = UpTime();
   int const offset = 1;
-  int const freq = sysconf(_SC_CLK_TCK);
   std::ifstream filestream(kProcDirectory + to_string(pid) + kStatFilename);
   if (filestream.is_open()) {
     getline(filestream, line);
@@ -293,7 +292,7 @@ long LinuxParser::UpTime(int pid) {
     std::istream_iterator<string> begin(linestream), end;
     vector<string> linecontent(begin, end);
     startTimeInClocks = stol(linecontent[22 - offset]);
-    startTimeInSeconds =  startTimeInClocks / freq;
+    startTimeInSeconds =  startTimeInClocks / FREQ;
     upTimeProcess = upTimeSystem - startTimeInSeconds;
   }
   return upTimeProcess;
