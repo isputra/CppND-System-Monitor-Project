@@ -109,7 +109,6 @@ vector<float> LinuxParser::VectorMemoryUtilization() {
   long cachedMemory = umap_meminfo["Cached"] + umap_meminfo["SReclaimable"] - umap_meminfo["Shmem"];
   long nonCacheBufferMemory = totalMemoryUsed - (buffers + cachedMemory);
   vector<float> v_mem;
-  v_mem.push_back((float) totalMemoryUsed / umap_meminfo["MemTotal"]);
   v_mem.push_back((float) nonCacheBufferMemory / umap_meminfo["MemTotal"]);
   v_mem.push_back((float) buffers / umap_meminfo["MemTotal"]);
   v_mem.push_back((float) cachedMemory / umap_meminfo["MemTotal"]);
