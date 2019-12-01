@@ -31,4 +31,6 @@ long int Process::UpTime() { return upTime_; }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a) const { return stof(ram_) < stof(a.ram_); }
+bool Process::operator<(Process const& a) const { 
+    return stof(this->ram_) > stof(a.ram_); 
+}
