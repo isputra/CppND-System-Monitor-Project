@@ -5,7 +5,7 @@
 double Processor::Utilization() {
     long const prev_idle = LinuxParser::IdleJiffies();
     long const prev_nonidle = LinuxParser::ActiveJiffies();
-    std::this_thread::sleep_for(std::chrono::milliseconds(400));
+    std::this_thread::sleep_for(std::chrono::milliseconds(100));
     long idle = LinuxParser::IdleJiffies();
     long nonidle = LinuxParser::ActiveJiffies();
     idle = idle - prev_idle;
