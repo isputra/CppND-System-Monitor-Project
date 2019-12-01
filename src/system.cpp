@@ -37,6 +37,8 @@ std::string System::Kernel() { return LinuxParser::Kernel(); }
 // TODO: Return the system's memory utilization
 float System::MemoryUtilization() { return LinuxParser::MemoryUtilization(); }
 
+vector<float> System::VectorMemoryUtilization() { return LinuxParser::VectorMemoryUtilization(); }
+
 // TODO: Return the operating system name
 std::string System::OperatingSystem() { return LinuxParser::OperatingSystem(); }
 
