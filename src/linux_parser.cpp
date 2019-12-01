@@ -133,7 +133,7 @@ float LinuxParser::Cpu(int pid) {
   long totalTime = ActiveJiffies(pid);
   long upTimeProcess = UpTime(pid);
   int const freq = sysconf(_SC_CLK_TCK);
-  cpuUsage = (float) ( (float) (totalTime / freq) / (float) upTimeProcess );
+  cpuUsage = ((float)totalTime / freq) / upTimeProcess;
   return cpuUsage;
 }
 
