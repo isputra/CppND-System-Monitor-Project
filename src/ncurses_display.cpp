@@ -7,6 +7,7 @@
 #include "format.h"
 #include "ncurses_display.h"
 #include "system.h"
+#include "sort_process.h"
 
 using std::string;
 using std::to_string;
@@ -119,9 +120,10 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   }
 }
 
-void NCursesDisplay::DisplayMenu(WINDOW* window, int& sort_highlited, int& sort_processes_by) {
-  int i = 0, key_input;
-  std::vector<std::string> sorting_list{"PID", "User", "CPU", "Ram", "UpTime"};
+void NCursesDisplay::DisplayMenu(WINDOW* window, std::size_t& sort_highlited, SortProcess& sort_processes_by) {
+  std::size_t i = 0;
+  int key_input;
+  std::vector<std::string> sorting_list{"PID", "User", "CPU", "RAM", "UpTime"};
   mvwprintw(window, 1, 1, "Sort by:");
   for (std::string& sorting : sorting_list) {
     if (i == sort_highlited) {
@@ -143,7 +145,11 @@ void NCursesDisplay::DisplayMenu(WINDOW* window, int& sort_highlited, int& sort_
       if (sort_highlited < sorting_list.size() - 1) sort_highlited++;
       break;
     case 10:
-      sort_processes_by = sort_highlited;
+      if (sorting_list[sort_highlited] == "PID") sort_processes_by = SortProcess::kPID_;
+      else if (sorting_list[sort_highlited] == "User") sort_processes_by = SortProcess::kUser_;
+      else if (sorting_list[sort_highlited] == "CPU") sort_processes_by = SortProcess::kCPU_;
+      else if (sorting_list[sort_highlited] == "RAM") sort_processes_by = SortProcess::kRAM_;
+      else if (sorting_list[sort_highlited] == "UpTime") sort_processes_by = SortProcess::kUpTime_;
       break;
     default:
       break;
@@ -157,7 +163,8 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
-  int sort_highlited = 0, sort_processes_by = 0;
+  std::size_t sort_highlited = 0;
+  SortProcess sort_processes_by = SortProcess::kRAM_;
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
