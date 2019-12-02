@@ -31,6 +31,22 @@ long int Process::UpTime() { return upTime_; }
 
 // TODO: Overload the "less than" comparison operator for Process objects
 // REMOVE: [[maybe_unused]] once you define the function
-bool Process::operator<(Process const& a) const { 
+bool Process::operator>(Process const& a) const { 
     return stoi(this->ram_) > stoi(a.ram_); 
+}
+
+bool Process::SortByPID(Process const& a) const {
+    return this->pid_ > a.pid_;
+}
+
+bool Process::SortByUser(Process const& a) const {
+    return this->user_ > a.user_;
+}
+
+bool Process::SortByCpu(Process const& a) const {
+    return this->cpu_ > a.cpu_;
+}
+
+bool Process::SortByUpTime(Process const& a) const {
+    return this->upTime_ > a.upTime_;
 }

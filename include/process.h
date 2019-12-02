@@ -24,7 +24,11 @@ class Process {
   float CpuUtilization();                  // TODO: See src/process.cpp
   std::string Ram();                       // TODO: See src/process.cpp
   long int UpTime();                       // TODO: See src/process.cpp
-  bool operator<(Process const& a) const;  // TODO: See src/process.cpp
+  bool operator>(Process const& a) const;  // TODO: See src/process.cpp
+  bool SortByPID(Process const& a) const;
+  bool SortByUser(Process const& a) const;
+  bool SortByCpu(Process const& a) const;
+  bool SortByUpTime(Process const& a) const;
 
   // TODO: Declare any necessary private members
  private:
