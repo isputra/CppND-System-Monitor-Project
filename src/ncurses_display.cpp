@@ -123,12 +123,18 @@ void NCursesDisplay::DisplayMenu(WINDOW* window, std::size_t& sort_highlited, st
   std::size_t i = 0;
   int key_input;
   std::vector<std::string> sorting_list{"PID", "User", "CPU", "RAM", "UpTime"};
+  wattron(window, COLOR_PAIR(2));
   mvwprintw(window, 1, 1, "Sort by:");
+  wattroff(window, COLOR_PAIR(2));
   for (std::string& sorting : sorting_list) {
     if (i == sort_highlited) {
       wattron(window, A_REVERSE);
       mvwprintw(window, 1, 10+(5*i), sorting.c_str());
       wattroff(window, A_REVERSE);
+    } else if (i == sort_processes_by) {
+      wattron(window, COLOR_PAIR(4));
+      mvwprintw(window, 1, 10+(5*i), sorting.c_str());
+      wattroff(window, COLOR_PAIR(4));
     } else {
       mvwprintw(window, 1, 10+(5*i), sorting.c_str());
     }
