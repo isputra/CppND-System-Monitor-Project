@@ -8,7 +8,6 @@
 #include "processor.h"
 #include "system.h"
 #include "linux_parser.h"
-#include "sort_process.h"
 
 using std::set;
 using std::size_t;
@@ -19,7 +18,7 @@ using std::vector;
 Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes(SortProcess sort_processes_by) {
+vector<Process>& System::Processes(std::size_t sort_processes_by) {
     vector<int> pids(LinuxParser::Pids());
     vector<int>::iterator iter_pids;
     for (iter_pids = pids.begin(); iter_pids != pids.end(); iter_pids++) {
@@ -28,19 +27,19 @@ vector<Process>& System::Processes(SortProcess sort_processes_by) {
     }
     switch (sort_processes_by)
     {
-    case SortProcess::kPID_:
+    case Process::ProcessColumn::cPID_:
         sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByPID(b);});
         break;
-    case SortProcess::kUser_:
+    case Process::ProcessColumn::cUser_:
         sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByUser(b);});
         break;
-    case SortProcess::kCPU_:
+    case Process::ProcessColumn::cCPU_:
         sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByCpu(b);});
         break;
-    case SortProcess::kRAM_:
+    case Process::ProcessColumn::cRAM_:
         sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a>b;});
         break;
-    case SortProcess::kUpTime_:
+    case Process::ProcessColumn::cUpTime_:
         sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByUpTime(b);});
         break;
     default:

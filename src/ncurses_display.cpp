@@ -7,7 +7,6 @@
 #include "format.h"
 #include "ncurses_display.h"
 #include "system.h"
-#include "sort_process.h"
 
 using std::string;
 using std::to_string;
@@ -120,7 +119,7 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   }
 }
 
-void NCursesDisplay::DisplayMenu(WINDOW* window, std::size_t& sort_highlited, SortProcess& sort_processes_by) {
+void NCursesDisplay::DisplayMenu(WINDOW* window, std::size_t& sort_highlited, std::size_t& sort_processes_by) {
   std::size_t i = 0;
   int key_input;
   std::vector<std::string> sorting_list{"PID", "User", "CPU", "RAM", "UpTime"};
@@ -145,11 +144,7 @@ void NCursesDisplay::DisplayMenu(WINDOW* window, std::size_t& sort_highlited, So
       if (sort_highlited < sorting_list.size() - 1) sort_highlited++;
       break;
     case 10:
-      if (sorting_list[sort_highlited] == "PID") sort_processes_by = SortProcess::kPID_;
-      else if (sorting_list[sort_highlited] == "User") sort_processes_by = SortProcess::kUser_;
-      else if (sorting_list[sort_highlited] == "CPU") sort_processes_by = SortProcess::kCPU_;
-      else if (sorting_list[sort_highlited] == "RAM") sort_processes_by = SortProcess::kRAM_;
-      else if (sorting_list[sort_highlited] == "UpTime") sort_processes_by = SortProcess::kUpTime_;
+      sort_processes_by = sort_highlited;
       break;
     default:
       break;
@@ -164,7 +159,7 @@ void NCursesDisplay::Display(System& system, int n) {
 
   int x_max{getmaxx(stdscr)};
   std::size_t sort_highlited = 0;
-  SortProcess sort_processes_by = SortProcess::kRAM_;
+  std::size_t sort_processes_by = Process::ProcessColumn::cRAM_;
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
@@ -190,7 +185,7 @@ void NCursesDisplay::Display(System& system, int n) {
     wrefresh(process_window);
     wrefresh(menu_window);
     refresh();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
   endwin();
 }

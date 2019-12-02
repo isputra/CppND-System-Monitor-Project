@@ -29,6 +29,13 @@ class Process {
   bool SortByUser(Process const& a) const;
   bool SortByCpu(Process const& a) const;
   bool SortByUpTime(Process const& a) const;
+  enum ProcessColumn {
+    cPID_=0,
+    cUser_,
+    cCPU_,
+    cRAM_,
+    cUpTime_
+  };
 
   // TODO: Declare any necessary private members
  private:
