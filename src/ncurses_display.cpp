@@ -28,6 +28,46 @@ std::string NCursesDisplay::ProgressBar(float percent) {
   return result + " " + display + "/100%";
 }
 
+// Show bars based on its group
+std::string NCursesDisplay::ShowBars(float percent) {
+    std::string result{};
+    int size{50};
+    float bars{percent * size};
+
+    for (int i{0}; i < bars; ++i) {
+        result += '|';
+    }
+
+    return result;
+}
+
+// Display Progress bar as groups
+void NCursesDisplay::GroupProgressBar(WINDOW* system_window, int row, std::vector<float> percentages) {
+    int idx_color_pair = 2; // color pair that'll be assigned to each group of bar
+    int start_column = 12; // 10 + length of string(0%)
+    float total_percent = 0.0;
+
+    wattron(system_window, COLOR_PAIR(1));
+    mvwprintw(system_window, row, 10, "0%%");
+    wattroff(system_window, COLOR_PAIR(1));
+    for (auto &percent: percentages) {
+        wattron(system_window, COLOR_PAIR(++idx_color_pair));
+        mvwprintw(system_window, row, start_column, "");
+        wprintw(system_window, ShowBars(percent).c_str());
+        wattroff(system_window, COLOR_PAIR(idx_color_pair));
+        float bars{percent * 50};
+        start_column += bars;
+        total_percent += percent;
+    }
+    string display{to_string(total_percent * 100).substr(0, 4)};
+    if (total_percent < 0.1 || total_percent == 1.0)
+        display = " " + to_string(total_percent * 100).substr(0, 3);
+    string label{" " + display + "/100%%"};
+    wattron(system_window, COLOR_PAIR(1));
+    mvwprintw(system_window, row, 62, label.c_str());
+    wattroff(system_window, COLOR_PAIR(1));
+}
+
 void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   int row{0};
   mvwprintw(window, ++row, 2, ("OS: " + system.OperatingSystem()).c_str());
@@ -38,10 +78,7 @@ void NCursesDisplay::DisplaySystem(System& system, WINDOW* window) {
   wprintw(window, ProgressBar(system.Cpu().Utilization()).c_str());
   wattroff(window, COLOR_PAIR(1));
   mvwprintw(window, ++row, 2, "Memory: ");
-  wattron(window, COLOR_PAIR(1));
-  mvwprintw(window, row, 10, "");
-  wprintw(window, ProgressBar(system.MemoryUtilization()).c_str());
-  wattroff(window, COLOR_PAIR(1));
+  GroupProgressBar(window, row, system.VectorMemoryUtilization());
   mvwprintw(window, ++row, 2,
             ("Total Processes: " + to_string(system.TotalProcesses())).c_str());
   mvwprintw(
@@ -82,6 +119,44 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   }
 }
 
+void NCursesDisplay::DisplayMenu(WINDOW* window, std::size_t& sort_highlited, std::size_t& sort_processes_by) {
+  std::size_t i = 0;
+  int key_input;
+  std::vector<std::string> sorting_list{"PID", "User", "CPU", "RAM", "UpTime"};
+  wattron(window, COLOR_PAIR(2));
+  mvwprintw(window, 1, 1, "Sort by:");
+  wattroff(window, COLOR_PAIR(2));
+  for (std::string& sorting : sorting_list) {
+    if (i == sort_highlited) {
+      wattron(window, A_REVERSE);
+      mvwprintw(window, 1, 10+(5*i), sorting.c_str());
+      wattroff(window, A_REVERSE);
+    } else if (i == sort_processes_by) {
+      wattron(window, COLOR_PAIR(4));
+      mvwprintw(window, 1, 10+(5*i), sorting.c_str());
+      wattroff(window, COLOR_PAIR(4));
+    } else {
+      mvwprintw(window, 1, 10+(5*i), sorting.c_str());
+    }
+    i++;
+  }
+  key_input = wgetch(window);
+  
+  switch(key_input) {
+    case KEY_LEFT:
+      if (sort_highlited > 0) sort_highlited--;
+      break;
+    case KEY_RIGHT:
+      if (sort_highlited < sorting_list.size() - 1) sort_highlited++;
+      break;
+    case 10:
+      sort_processes_by = sort_highlited;
+      break;
+    default:
+      break;
+  }
+}
+
 void NCursesDisplay::Display(System& system, int n) {
   initscr();      // start ncurses
   noecho();       // do not print input values
@@ -89,21 +164,34 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
+  std::size_t sort_highlited = 0;
+  std::size_t sort_processes_by = Process::ProcessColumn::cRAM_;
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
+  WINDOW* menu_window = newwin(3, x_max - 1, system_window->_maxy + process_window->_maxy + 2, 0);
+  
+  keypad(menu_window, true);
+  nodelay(menu_window, true);
 
   while (1) {
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
     init_pair(2, COLOR_GREEN, COLOR_BLACK);
+    init_pair(3, COLOR_CYAN, COLOR_BLACK);
+    init_pair(4, COLOR_YELLOW, COLOR_BLACK);
+    init_pair(5, COLOR_GREEN, COLOR_BLACK);
+    init_pair(6, COLOR_RED, COLOR_BLACK);
     box(system_window, 0, 0);
     box(process_window, 0, 0);
+    box(menu_window, 0, 0);
     DisplaySystem(system, system_window);
-    DisplayProcesses(system.Processes(), process_window, n);
+    DisplayProcesses(system.Processes(sort_processes_by), process_window, n);
+    DisplayMenu(menu_window, sort_highlited, sort_processes_by);
     wrefresh(system_window);
     wrefresh(process_window);
+    wrefresh(menu_window);
     refresh();
-    std::this_thread::sleep_for(std::chrono::seconds(1));
+    std::this_thread::sleep_for(std::chrono::milliseconds(500));
   }
   endwin();
 }
