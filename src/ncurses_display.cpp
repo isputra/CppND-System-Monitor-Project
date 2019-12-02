@@ -11,6 +11,9 @@
 using std::string;
 using std::to_string;
 
+void NCursesDisplay::SortProcesses(System& system, int& sort_chosen) {
+
+}
 // 50 bars uniformly displayed from 0 - 100 %
 // 2% is one bar(|)
 std::string NCursesDisplay::ProgressBar(float percent) {
@@ -119,6 +122,37 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   }
 }
 
+void NCursesDisplay::DisplayMenu(System& system, WINDOW* window, int &sort_highlited) {
+  int i = 0, key_input;
+  std::vector<std::string> sorting_list{"PID", "User", "CPU", "Ram", "Time"};
+  mvwprintw(window, 1, 1, "Sort by:");
+  for (std::string& sorting : sorting_list) {
+    if (i == sort_highlited) {
+      wattron(window, A_REVERSE);
+      mvwprintw(window, 1, 10+(5*i), sorting.c_str());
+      wattroff(window, A_REVERSE);
+    } else {
+      mvwprintw(window, 1, 10+(5*i), sorting.c_str());
+    }
+    i++;
+  }
+  key_input = wgetch(window);
+  
+  switch(key_input) {
+    case KEY_LEFT:
+      if (sort_highlited > 0) sort_highlited--;
+      break;
+    case KEY_RIGHT:
+      if (sort_highlited < sorting_list.size()) sort_highlited++;
+      break;
+    case 10:
+      SortProcesses(system, sort_highlited);
+      break;
+    default:
+      break;
+  }
+}
+
 void NCursesDisplay::Display(System& system, int n) {
   initscr();      // start ncurses
   noecho();       // do not print input values
@@ -126,9 +160,14 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
+  int sort_highlited = 0;
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
+  WINDOW* menu_window = newwin(3, x_max - 1, system_window->_maxy + process_window->_maxy + 2, 0);
+  
+  keypad(menu_window, true);
+  nodelay(menu_window, true);
 
   while (1) {
     init_pair(1, COLOR_BLUE, COLOR_BLACK);
@@ -139,10 +178,13 @@ void NCursesDisplay::Display(System& system, int n) {
     init_pair(6, COLOR_RED, COLOR_BLACK);
     box(system_window, 0, 0);
     box(process_window, 0, 0);
+    box(menu_window, 0, 0);
     DisplaySystem(system, system_window);
     DisplayProcesses(system.Processes(), process_window, n);
+    DisplayMenu(system, menu_window, sort_highlited);
     wrefresh(system_window);
     wrefresh(process_window);
+    wrefresh(menu_window);
     refresh();
     std::this_thread::sleep_for(std::chrono::seconds(1));
   }
