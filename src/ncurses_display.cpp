@@ -11,9 +11,6 @@
 using std::string;
 using std::to_string;
 
-void NCursesDisplay::SortProcesses(System& system, int& sort_chosen) {
-
-}
 // 50 bars uniformly displayed from 0 - 100 %
 // 2% is one bar(|)
 std::string NCursesDisplay::ProgressBar(float percent) {
@@ -122,9 +119,9 @@ void NCursesDisplay::DisplayProcesses(std::vector<Process>& processes,
   }
 }
 
-void NCursesDisplay::DisplayMenu(System& system, WINDOW* window, int &sort_highlited) {
+void NCursesDisplay::DisplayMenu(WINDOW* window, int& sort_highlited, int& sort_processes_by) {
   int i = 0, key_input;
-  std::vector<std::string> sorting_list{"PID", "User", "CPU", "Ram", "Time"};
+  std::vector<std::string> sorting_list{"PID", "User", "CPU", "Ram", "UpTime"};
   mvwprintw(window, 1, 1, "Sort by:");
   for (std::string& sorting : sorting_list) {
     if (i == sort_highlited) {
@@ -143,10 +140,10 @@ void NCursesDisplay::DisplayMenu(System& system, WINDOW* window, int &sort_highl
       if (sort_highlited > 0) sort_highlited--;
       break;
     case KEY_RIGHT:
-      if (sort_highlited < sorting_list.size()) sort_highlited++;
+      if (sort_highlited < sorting_list.size() - 1) sort_highlited++;
       break;
     case 10:
-      SortProcesses(system, sort_highlited);
+      sort_processes_by = sort_highlited;
       break;
     default:
       break;
@@ -160,7 +157,7 @@ void NCursesDisplay::Display(System& system, int n) {
   start_color();  // enable color
 
   int x_max{getmaxx(stdscr)};
-  int sort_highlited = 0;
+  int sort_highlited = 0, sort_processes_by = 0;
   WINDOW* system_window = newwin(9, x_max - 1, 0, 0);
   WINDOW* process_window =
       newwin(3 + n, x_max - 1, system_window->_maxy + 1, 0);
@@ -180,8 +177,8 @@ void NCursesDisplay::Display(System& system, int n) {
     box(process_window, 0, 0);
     box(menu_window, 0, 0);
     DisplaySystem(system, system_window);
-    DisplayProcesses(system.Processes(), process_window, n);
-    DisplayMenu(system, menu_window, sort_highlited);
+    DisplayProcesses(system.Processes(sort_processes_by), process_window, n);
+    DisplayMenu(menu_window, sort_highlited, sort_processes_by);
     wrefresh(system_window);
     wrefresh(process_window);
     wrefresh(menu_window);
