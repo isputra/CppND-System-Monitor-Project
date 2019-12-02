@@ -18,16 +18,33 @@ using std::vector;
 Processor& System::Cpu() { return cpu_; }
 
 // TODO: Return a container composed of the system's processes
-vector<Process>& System::Processes() {
+vector<Process>& System::Processes(int sort_processes_by) {
     vector<int> pids(LinuxParser::Pids());
     vector<int>::iterator iter_pids;
     for (iter_pids = pids.begin(); iter_pids != pids.end(); iter_pids++) {
         Process p(*iter_pids);
         processes_.push_back(p);
     }
-    sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {
-        return a<b;
-    });
+    switch (sort_processes_by)
+    {
+    case 0:
+        sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByPID(b);});
+        break;
+    case 1:
+        sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByUser(b);});
+        break;
+    case 2:
+        sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByCpu(b);});
+        break;
+    case 3:
+        sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a>b;});
+        break;
+    case 4:
+        sort(processes_.begin(), processes_.end(), [](Process const& a, Process const& b) {return a.SortByUpTime(b);});
+        break;
+    default:
+        break;
+    }
     return processes_;
 }
 
